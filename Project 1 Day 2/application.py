@@ -1,11 +1,15 @@
 import os
 
-from flask import Flask, session
+from flask import Flask, session,,url_for
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from flask import render_template
 from flask import request
+from passlib.hash import bcrypt
+from flask_sqlalchemy import SQLAlchemy
+import sys
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -66,4 +70,16 @@ def register():
         sys.stdout.flush()
         return 'Registration Failed'
     return 'Registration Success'
+ 
+#TASK - 6 DISPLAY RECORDS FOR ADMIN USING ADMIN.html page 
+@app.route("/admin")
+def admin():
+    try:
+        users = Dataentry.query.all()
+
+    except Exception as e:
+        print(e)
+        sys.stdout.flush()
+        return 'Admin Failed'
+    return render_template("admin.html", users = users)
 
