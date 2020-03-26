@@ -54,10 +54,16 @@ db.create_all()
 def index():
     return render_template("index.html")
 
+#TASK - 5 INSERTING RECORDSINTO DATABASE
 @app.route("/register" , methods=['POST'])
 def register():
-    # print(request.form['Username'])
-    result = request.form
-    # print(result.items())
-    return render_template("result.html", result = result.items())
+	indata = Dataentry(request.form['Username'], request.form['Email'], request.form['password'], datetime.now())
+    try:
+        db.session.add(indata)
+        db.session.commit()
+    except Exception as e:
+        print(e)
+        sys.stdout.flush()
+        return 'Registration Failed'
+    return 'Registration Success'
 
