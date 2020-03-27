@@ -20,7 +20,7 @@ if not os.getenv("DATABASE_URL"):
 # Configure session to use filesystem
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://sgrwbvfpglusrx:579f0fd0edc0214e2642000c00ec1734a0206342eb055c5bf214596697441880@ec2-18-213-176-229.compute-1.amazonaws.com:5432/d5na60isuu66op'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL") 
 
 Session(app)
 
@@ -39,14 +39,14 @@ class Dataentry(db.Model):
     Name = db.Column(db.String() , nullable=False)
     Email = db.Column(db.String(), primary_key=True, nullable=False)
     password = db.Column(db.String() , nullable=False)
-    timezone = db.Column(db.DateTime(timezone=True), nullable=False)
+    timestamp = db.Column(db.DateTime(timezone=True), nullable=False)
     def __init__ (self, name, email, password, time):
         # self.IndexNo = sno
 
         self.Name = name
         self.Email = email
         self.password = bcrypt.encrypt(password)
-        self.timezone = time
+        self.timestamp = datetime.now()
 
     def validate_password(self, password):
         return bcrypt.verify(password, self.password)
@@ -61,7 +61,7 @@ def index():
 #TASK - 5 INSERTING RECORDSINTO DATABASE
 @app.route("/register" , methods=['POST'])
 def register():
-	indata = Dataentry(request.form['Username'], request.form['Email'], request.form['password'], datetime.now())
+	indata = Dataentry(request.form['Username'], request.form['Email'], request.form['password'])
     try:
         db.session.add(indata)
         db.session.commit()
