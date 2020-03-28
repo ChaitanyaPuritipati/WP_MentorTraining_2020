@@ -83,3 +83,26 @@ def admin():
         return 'Admin Failed'
     return render_template("admin.html", users = users)
 
+#Day4 - TASK-1 Directing Login route
+@app.route('/auth', methods=['POST'])
+def login_post():
+    email = request.form.get('email')
+    password = request.form.get('password')
+
+    user = Dataentry.query.filter_by(Email=email).first()
+    print(user)
+    # check if user actually exists
+    # take the user supplied password, hash it, and compare it to the hashed password in database
+    # or not bcrypt.verify(password , user.password)
+    if not user:
+        flash('User is not present. Please register to login.')
+        return redirect('/') # if user doesn't exist reload the page
+    if not bcrypt.verify(password, user.password):
+        flash('Wrong Login credentials')
+        return redirect('/') # if user gives wrong password exist reload the page
+
+    return redirect('/welcome')
+
+@app.route("/welcome")
+def welcome():
+    return "WELCOME TO HOME PAGE"

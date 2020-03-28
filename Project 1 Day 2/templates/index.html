@@ -3,40 +3,67 @@
 <div class="container" id = "bookbody">
   <div class = "row">
       <div class = "col-md-6" id = "signin">
-          SignIn
+          <form  action = "/auth" method = "post"  style = "width: 90%;">
+          <h3>Sign In</h3>
+          
+          <div class="form-group">
+            <input type="email" class="form-control" id="signinmailid" aria-describedby="emailHelp" placeholder="Email" name = "email">
+            <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+          </div>
+          <div class="form-group">
+            <input type="password" class="form-control" id="signinpass" placeholder="Password" name = "password">
+          </div>
+          <button type="submit" class="btn btn-primary">Login</button>
+          {% with messages = get_flashed_messages() %}
+                {% if messages and ('login' in messages[0]) %}
+                    <div class="alert alert-danger alert-dismissible fade show">
+                      <button type="button" class="close" data-dismiss="alert">&times;</button> 
+                      {{ messages[0] }}
+                    </div>
+                {% endif %}
+              {% endwith %}
+        </form>
       </div>
       <div class = "col-lg-6" id = "register">
-         
-          <form action = "{{ url_for('register') }}" method="post" oninput='confirmpassword.setCustomValidity(confirmpassword.value != password.value ? "Passwords do not match." : "")'>
+         <form action = "/register"  method="post" oninput='confirmpassword.setCustomValidity(confirmpassword.value != password.value ? "Passwords do not match." : "")' style = "width: 90%;">
               <h3>Register</h3>
-              <div class="form-group row" >
-                  <div class="col">
+              
+              <div class="form-group" >
+                  
                     <input type="text" class="form-control" id="inputName1" placeholder="Username" name = "Username">
-                  </div>
+                
                 </div>
-              <div class="form-group row">
-                <div class="col-sm-12">
-                  <input type="email" class="form-control" id="inputEmail3" placeholder="Email"  name = "Email">
-                </div>
-              </div>
-              <div class="form-group row">
+              <div class="form-group">
+                
+                  <input type="email" class="form-control" id="inputEmail3" placeholder="Email"  name = "Email" aria-describedby="emailHelp">
               
-                <div class="col-sm-12">
+              </div>
+              <div class="form-group">
+              
+                
                   <input type="password" class="form-control" id="inputPassword3" placeholder="Password" name = "password">
-                </div>
+                
               </div>
-              <div class="form-group row">
+              <div class="form-group">
               
-                  <div class="col-sm-12">
+                
                     <input type="password" class="form-control" id="inputPassword4" placeholder="ConfirmPassword" name = "confirmpassword">
-                  </div>
+                  
                 </div>
               
-              <div class="form-group row">
-                <div class="col-sm-10">
+              <div class="form-group">
+                
                   <button type="submit" class="btn btn-primary">Register</button>
-                </div>
+                
               </div>
+              {% with messages = get_flashed_messages() %}
+                {% if messages and ('login' not in messages[0]) %}
+                    <div class="alert alert-danger alert-dismissible fade show">
+                      <button type="button" class="close" data-dismiss="alert">&times;</button> 
+                      {{ messages[0] }}
+                    </div>
+                {% endif %}
+              {% endwith %}
             </form>
       </div>
   </div> 
