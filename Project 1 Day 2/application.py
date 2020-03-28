@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, session,,url_for
+from flask import Flask, session,,url_for, flash, redirect
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -10,6 +10,9 @@ from passlib.hash import bcrypt
 from flask_sqlalchemy import SQLAlchemy
 import sys
 from datetime import datetime
+from flask_login import LoginManager
+from flask_login import login_user,login_required, current_user, logout_user
+from flask_login import UserMixin
 
 app = Flask(__name__)
 
@@ -31,9 +34,24 @@ session = Session()
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
+#DAY4 - TASK-2 USING LOGIN MANAGER TO AUTHENTICATE USER SESSIONS
+login_manager = LoginManager()
+login_manager.login_view = 'auth'
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def load_user(user_Email):
+    # since the user_id is just the primary key of our user table, use it in the query for the user
+    return Dataentry.query.get(user_Email)
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    """Redirect unauthorized users to Login page."""
+    flash('You must login in to view that page.')
+    return redirect('/')
 
 #TASK - 4 CREATING A DATABASE TABLE 
-class Dataentry(db.Model):
+class Dataentry(UserMixin, db.Model):
     __tablename__ = "dataentry"
     # IndexNo = db.Column(db.Integer)
     Name = db.Column(db.String() , nullable=False)
@@ -50,6 +68,9 @@ class Dataentry(db.Model):
 
     def validate_password(self, password):
         return bcrypt.verify(password, self.password)
+
+    def get_id(self):
+           return (self.Email)
 
 db.create_all()
 
@@ -103,6 +124,15 @@ def login_post():
 
     return redirect('/welcome')
 
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect("/")
+
+
 @app.route("/welcome")
+@login_required
 def welcome():
-    return "WELCOME TO HOME PAGE"
+    return render_template("home.html", user = current_user)
+

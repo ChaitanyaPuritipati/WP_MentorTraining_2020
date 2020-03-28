@@ -1,0 +1,14 @@
+{% extends "generictemplate.html" %}
+{% block title %} Welcome {% endblock %}
+{% block body %}
+<nav class="navbar navbar-light bg-light">
+    <a class="navbar-brand" href="/welcome">
+      <img src="https://img.freepik.com/free-vector/hand-drawn-world-book-day-concept_23-2148469171.jpg?size=338&ext=jpg" width="30" height="30" class="d-inline-block align-top" alt="">
+      ReadRateReview
+    </a>
+      <button type="button" class="btn btn-outline-primary ml-auto" style = "margin-right: 5px;" disabled>{{user.Name}}</button>
+    <form action = "/logout">
+        <button class="btn btn-outline-warning" type="submit">Logout</button>
+    </form>
+  </nav>
+{% endblock %}
