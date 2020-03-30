@@ -89,9 +89,10 @@ def register():
     except Exception as e:
         print(e)
         sys.stdout.flush()
-        return 'Registration Failed'
-    return 'Registration Success'
- 
+        flash('Sorry!!! Registration Failed')
+        return redirect('/')
+    flash('Registration Success')
+    return redirect('/') 
 #TASK - 6 DISPLAY RECORDS FOR ADMIN USING ADMIN.html page 
 @app.route("/admin")
 def admin():
@@ -121,7 +122,7 @@ def login_post():
     if not bcrypt.verify(password, user.password):
         flash('Wrong Login credentials')
         return redirect('/') # if user gives wrong password exist reload the page
-
+    login_user(user)
     return redirect('/welcome')
 
 @app.route('/logout')

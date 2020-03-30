@@ -58,10 +58,17 @@
               </div>
               {% with messages = get_flashed_messages() %}
                 {% if messages and ('login' not in messages[0]) %}
+                    {% if 'Sorry' in messages[0] %}
                     <div class="alert alert-danger alert-dismissible fade show">
                       <button type="button" class="close" data-dismiss="alert">&times;</button> 
                       {{ messages[0] }}
                     </div>
+                    {% else %}
+                    <div class="alert alert-success alert-dismissible fade show">
+                      <button type="button" class="close" data-dismiss="alert">&times;</button> 
+                      {{ messages[0] }}
+                    </div>
+                    {% endif %}
                 {% endif %}
               {% endwith %}
             </form>
