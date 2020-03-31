@@ -140,14 +140,16 @@ def welcome():
 def search():
     query = request.form.get('query')
     option = request.form.get('search')
-    print(query,option)
     books = []
     if option == "title":
-        books = session.query(Books).filter_by(title=query).all()
+        looking_for = '%{0}%'.format(query)
+        books = session.query(Books).filter(Books.title.like(looking_for)).all()
     elif option == "author":
-        books = session.query(Books).filter_by(author=query).all()
+        looking_for = '%{0}%'.format(query)
+        books = session.query(Books).filter(Books.author.like(looking_for)).all()
     elif option == "isbn":
-        books = session.query(Books).filter_by(isbn=query).all()
+        looking_for = '%{0}%'.format(query)
+        books = session.query(Books).filter(Books.isbn.like(looking_for)).all()
     else:
         try:
             query = int(query)
