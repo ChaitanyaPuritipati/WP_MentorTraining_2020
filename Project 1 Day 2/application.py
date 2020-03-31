@@ -64,7 +64,6 @@ class Dataentry(UserMixin, db.Model):
     timestamp = db.Column(db.DateTime(timezone=True), nullable=False)
     def __init__ (self, name, email, password):
         # self.IndexNo = sno
-
         self.Name = name
         self.Email = email
         self.password = bcrypt.encrypt(password)
@@ -113,9 +112,7 @@ def admin():
 def login_post():
     email = request.form.get('email')
     password = request.form.get('password')
-
     user = Dataentry.query.filter_by(Email=email).first()
-    print(user)
     # check if user actually exists
     # take the user supplied password, hash it, and compare it to the hashed password in database
     # or not bcrypt.verify(password , user.password)
