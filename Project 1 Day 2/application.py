@@ -90,7 +90,6 @@ def register():
         db.session.add(indata)
         db.session.commit()
     except Exception as e:
-        print(e)
         sys.stdout.flush()
         flash('Sorry!!! Registration Failed')
         return redirect('/')
@@ -102,7 +101,6 @@ def admin():
     try:
         users = Dataentry.query.all()
     except Exception as e:
-        print(e)
         sys.stdout.flush()
         return 'Admin Failed'
     return render_template("admin.html", users = users)
@@ -148,8 +146,15 @@ def search():
         books = session.query(Books).filter_by(title=query).all()
     elif option == "author":
         books = session.query(Books).filter_by(author=query).all()
-    else:
+    elif option == "isbn":
         books = session.query(Books).filter_by(isbn=query).all()
+    else:
+        try:
+            query = int(query)
+        except Exception as e:
+            sys.stdout.flush()
+            return 'No results for your query'
+        books = session.query(Books).filter_by(year=query).all()
     if(len(books) <= 0):
         return "No results for your query"
     return render_template("home.html", user = current_user, flag = True ,data = books)
@@ -158,5 +163,4 @@ def search():
 @app.route('/bookdisplay/<book_id>')
 @login_required
 def bookdisplay(book_id):
-    print(book_id)
     return book_id
