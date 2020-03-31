@@ -1,8 +1,8 @@
 import os
-
-from flask import Flask, session,,url_for, flash, redirect
+from flask import Flask, session, url_for, flash, redirect
 from flask_session import Session
 from sqlalchemy import create_engine
+from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 from flask import render_template
 from flask import request
@@ -34,6 +34,10 @@ session = Session()
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
+Base = automap_base()
+Base.prepare(engine, reflect=True)
+Books = Base.classes.books
+
 #DAY4 - TASK-2 USING LOGIN MANAGER TO AUTHENTICATE USER SESSIONS
 login_manager = LoginManager()
 login_manager.login_view = 'auth'
@@ -58,7 +62,7 @@ class Dataentry(UserMixin, db.Model):
     Email = db.Column(db.String(), primary_key=True, nullable=False)
     password = db.Column(db.String() , nullable=False)
     timestamp = db.Column(db.DateTime(timezone=True), nullable=False)
-    def __init__ (self, name, email, password, time):
+    def __init__ (self, name, email, password):
         # self.IndexNo = sno
 
         self.Name = name
@@ -82,7 +86,7 @@ def index():
 #TASK - 5 INSERTING RECORDSINTO DATABASE
 @app.route("/register" , methods=['POST'])
 def register():
-	indata = Dataentry(request.form['Username'], request.form['Email'], request.form['password'])
+    indata = Dataentry(request.form['Username'], request.form['Email'], request.form['password'])
     try:
         db.session.add(indata)
         db.session.commit()
@@ -98,7 +102,6 @@ def register():
 def admin():
     try:
         users = Dataentry.query.all()
-
     except Exception as e:
         print(e)
         sys.stdout.flush()
@@ -135,5 +138,28 @@ def logout():
 @app.route("/welcome")
 @login_required
 def welcome():
-    return render_template("home.html", user = current_user)
+    return render_template("home.html", user = current_user, flag = False)
 
+@app.route('/search', methods=['POST'])
+@login_required
+def search():
+    query = request.form.get('query')
+    option = request.form.get('search')
+    print(query,option)
+    books = []
+    if option == "title":
+        books = session.query(Books).filter_by(title=query).all()
+    elif option == "author":
+        books = session.query(Books).filter_by(author=query).all()
+    else:
+        books = session.query(Books).filter_by(isbn=query).all()
+    if(len(books) <= 0):
+        return "No results for your query"
+    return render_template("home.html", user = current_user, flag = True ,data = books)
+
+
+@app.route('/bookdisplay/<book_id>')
+@login_required
+def bookdisplay(book_id):
+    print(book_id)
+    return book_id

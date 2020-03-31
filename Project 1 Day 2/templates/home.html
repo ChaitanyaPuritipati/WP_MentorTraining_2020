@@ -11,4 +11,52 @@
         <button class="btn btn-outline-warning" type="submit">Logout</button>
     </form>
   </nav>
+  <form action="/search" method = "post">
+    <label for="search">Search Box</label>
+    <input type="search" class="form-control" placeholder="Search" name = "query">
+    <select name="search">
+      <option value="title">Title</option>
+      <option value="author">Author</option>
+      <option value="isbn">ISBN</option>
+    </select>
+    <input type="submit">
+  </form>
+  {% if flag %}
+  <div class="container">
+		<div class="row">
+			<div class="col-lg">
+		      <b>S. No.</b>
+		    </div>
+		    <div class="col-lg">
+		      <b>Author</b>
+		    </div>
+		    <div class="col-lg">
+		      <b>Title</b>
+		    </div>
+		    <div class="col-lg">
+		      <b>Year</b>
+		    </div>
+		</div>
+    </div>
+	{% for value in data %}
+	<div class="container">
+		<div class="row">
+		<div class="col-lg">
+		  {{loop.index}}
+		</div>	
+		<div class="col-lg">
+		  {{value.author}}
+    </div>
+		<div class="col-lg">
+    <a href = {{url_for('bookdisplay', book_id = value.isbn )}}>
+      {{value.title}}
+    </a>
+    </div>
+		<div class="col-lg">
+		  {{value.year}}
+		</div>
+		</div>
+	</div>
+  {% endfor %}
+  {% endif %}
 {% endblock %}
