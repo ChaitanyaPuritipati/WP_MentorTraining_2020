@@ -1,5 +1,10 @@
 import os
+<<<<<<< HEAD
 from flask import Flask, session, url_for, flash, redirect
+=======
+from sqlalchemy.ext.automap import automap_base
+from flask import Flask, session,url_for, flash, redirect
+>>>>>>> bookpage
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.ext.automap import automap_base
@@ -13,6 +18,8 @@ from datetime import datetime
 from flask_login import LoginManager
 from flask_login import login_user,login_required, current_user, logout_user
 from flask_login import UserMixin
+import requests
+import json
 
 app = Flask(__name__)
 
@@ -38,6 +45,11 @@ Base = automap_base()
 Base.prepare(engine, reflect=True)
 Books = Base.classes.books
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> bookpage
 #DAY4 - TASK-2 USING LOGIN MANAGER TO AUTHENTICATE USER SESSIONS
 login_manager = LoginManager()
 login_manager.login_view = 'auth'
@@ -118,7 +130,7 @@ def login_post():
         flash('User is not present. Please register to login.')
         return redirect('/') # if user doesn't exist reload the page
     if not bcrypt.verify(password, user.password):
-        flash('Wrong Login credentials')
+        flash('Wrong login credentials')
         return redirect('/') # if user gives wrong password exist reload the page
     login_user(user)
     return redirect('/welcome')
@@ -135,6 +147,7 @@ def logout():
 def welcome():
     return render_template("home.html", user = current_user, flag = False)
 
+<<<<<<< HEAD
 @app.route('/search', methods=['POST'])
 @login_required
 def search():
@@ -167,3 +180,14 @@ def search():
 @login_required
 def bookdisplay(book_id):
     return book_id
+=======
+
+@app.route("/books/<book_id>")
+@login_required
+def bookdisplay(book_id):
+    res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": "iGZG0s5CY0rwO3Muq7Nw0g", "isbns": book_id})
+    book = session.query(Books).filter_by(isbn=book_id).first()
+    r = json.dumps(res.json())
+    loaded_r = json.loads(r)
+    return render_template("book.html", ratings = loaded_r, details = book.__dict__, user = current_user)
+>>>>>>> bookpage
