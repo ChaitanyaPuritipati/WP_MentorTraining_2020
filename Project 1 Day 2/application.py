@@ -143,6 +143,7 @@ def search():
     books = []
     if option == "title":
         looking_for = '%{0}%'.format(query)
+        print(looking_for)
         books = session.query(Books).filter(Books.title.like(looking_for)).all()
     elif option == "author":
         looking_for = '%{0}%'.format(query)
