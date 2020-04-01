@@ -1,6 +1,6 @@
 import os
-
-from flask import Flask, session,,url_for, flash, redirect
+from sqlalchemy.ext.automap import automap_base
+from flask import Flask, session,url_for, flash, redirect
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -13,6 +13,8 @@ from datetime import datetime
 from flask_login import LoginManager
 from flask_login import login_user,login_required, current_user, logout_user
 from flask_login import UserMixin
+import requests
+import json
 
 app = Flask(__name__)
 
@@ -33,6 +35,12 @@ Session = scoped_session(sessionmaker(bind=engine))
 session = Session()
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
+Base = automap_base()
+Base.prepare(engine, reflect=True)
+Books = Base.classes.books
+
+
 
 #DAY4 - TASK-2 USING LOGIN MANAGER TO AUTHENTICATE USER SESSIONS
 login_manager = LoginManager()
@@ -58,7 +66,7 @@ class Dataentry(UserMixin, db.Model):
     Email = db.Column(db.String(), primary_key=True, nullable=False)
     password = db.Column(db.String() , nullable=False)
     timestamp = db.Column(db.DateTime(timezone=True), nullable=False)
-    def __init__ (self, name, email, password, time):
+    def __init__ (self, name, email, password):
         # self.IndexNo = sno
 
         self.Name = name
@@ -82,7 +90,7 @@ def index():
 #TASK - 5 INSERTING RECORDSINTO DATABASE
 @app.route("/register" , methods=['POST'])
 def register():
-	indata = Dataentry(request.form['Username'], request.form['Email'], request.form['password'])
+    indata = Dataentry(request.form['Username'], request.form['Email'], request.form['password'])
     try:
         db.session.add(indata)
         db.session.commit()
@@ -120,7 +128,7 @@ def login_post():
         flash('User is not present. Please register to login.')
         return redirect('/') # if user doesn't exist reload the page
     if not bcrypt.verify(password, user.password):
-        flash('Wrong Login credentials')
+        flash('Wrong login credentials')
         return redirect('/') # if user gives wrong password exist reload the page
     login_user(user)
     return redirect('/welcome')
@@ -137,3 +145,12 @@ def logout():
 def welcome():
     return render_template("home.html", user = current_user)
 
+
+@app.route("/books/<book_id>")
+@login_required
+def bookdisplay(book_id):
+    res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": "iGZG0s5CY0rwO3Muq7Nw0g", "isbns": book_id})
+    book = session.query(Books).filter_by(isbn=book_id).first()
+    r = json.dumps(res.json())
+    loaded_r = json.loads(r)
+    return render_template("book.html", ratings = loaded_r, details = book.__dict__, user = current_user)
