@@ -1,10 +1,6 @@
 import os
-<<<<<<< HEAD
-from flask import Flask, session, url_for, flash, redirect
-=======
 from sqlalchemy.ext.automap import automap_base
-from flask import Flask, session,url_for, flash, redirect
->>>>>>> bookpage
+from flask import Flask, session,url_for, flash, redirect, jsonify
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.ext.automap import automap_base
@@ -45,11 +41,6 @@ Base = automap_base()
 Base.prepare(engine, reflect=True)
 Books = Base.classes.books
 
-<<<<<<< HEAD
-=======
-
-
->>>>>>> bookpage
 #DAY4 - TASK-2 USING LOGIN MANAGER TO AUTHENTICATE USER SESSIONS
 login_manager = LoginManager()
 login_manager.login_view = 'auth'
@@ -147,16 +138,14 @@ def logout():
 def welcome():
     return render_template("home.html", user = current_user, flag = False)
 
-<<<<<<< HEAD
 @app.route('/search', methods=['POST'])
 @login_required
 def search():
     query = request.form.get('query')
-    option = request.form.get('search')
+    option = request.form.get('option')
     books = []
     if option == "title":
         looking_for = '%{0}%'.format(query)
-        print(looking_for)
         books = session.query(Books).filter(Books.title.like(looking_for)).all()
     elif option == "author":
         looking_for = '%{0}%'.format(query)
@@ -176,12 +165,6 @@ def search():
     return render_template("home.html", user = current_user, flag = True ,data = books)
 
 
-@app.route('/bookdisplay/<book_id>')
-@login_required
-def bookdisplay(book_id):
-    return book_id
-=======
-
 @app.route("/books/<book_id>")
 @login_required
 def bookdisplay(book_id):
@@ -190,4 +173,43 @@ def bookdisplay(book_id):
     r = json.dumps(res.json())
     loaded_r = json.loads(r)
     return render_template("book.html", ratings = loaded_r, details = book.__dict__, user = current_user)
->>>>>>> bookpage
+
+@app.route("/api/search/", methods = ["POST"])
+def search_api():
+
+    print(request.get_json())
+    if not request.is_json:
+        return jsonify({"Error":'Invalid request format'}), 405
+    books = []
+    data = request.get_json()
+    query = data['que']
+    option = data['opt']
+    if option is None or query is None or query == "":
+        return jsonify({"Error":'Bad request'}), 400
+    if option == "title":
+        looking_for = '%{0}%'.format(query)
+        books = session.query(Books).filter(Books.title.like(looking_for)).all()
+    elif option == "author":
+        looking_for = '%{0}%'.format(query)
+        books = session.query(Books).filter(Books.author.like(looking_for)).all()
+    elif option == "isbn":
+        looking_for = '%{0}%'.format(query)
+        books = session.query(Books).filter(Books.isbn.like(looking_for)).all()
+    else:
+        try:
+            query = int(query)
+        except Exception as e:
+            sys.stdout.flush()
+            return jsonify({"Error":'Cannot process your request'}), 422
+        books = session.query(Books).filter_by(year=query).all()
+    if(len(books) <= 0):
+        return jsonify({"Error":'No results for your query'}), 404
+    resp = []
+    for vals in books:
+        d = {}
+        d["title"] = vals.title
+        d["isbn"] = vals.isbn
+        d["author"] = vals.author
+        d["year"] = vals.year
+        resp.append(d)
+    return jsonify({"response":resp}), 200
