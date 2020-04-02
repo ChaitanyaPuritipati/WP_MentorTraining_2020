@@ -177,7 +177,7 @@ def bookdisplay(book_id):
 @app.route("/api/search/", methods = ["POST"])
 def search_api():
 
-    # print(request.get_json())
+    print(request.get_json())
     if not request.is_json:
         return jsonify({"Error":'Invalid request format'}), 405
     books = []
@@ -212,4 +212,4 @@ def search_api():
         d["author"] = vals.author
         d["year"] = vals.year
         resp.append(d)
-    return jsonify({"response":resp})
+    return jsonify({"response":resp}), 200
