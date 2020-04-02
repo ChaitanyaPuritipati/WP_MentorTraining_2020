@@ -1,10 +1,7 @@
 import os
-<<<<<<< HEAD
 from flask import Flask, session, url_for, flash, redirect
-=======
 from sqlalchemy.ext.automap import automap_base
 from flask import Flask, session,url_for, flash, redirect
->>>>>>> bookpage
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.ext.automap import automap_base
@@ -45,11 +42,8 @@ Base = automap_base()
 Base.prepare(engine, reflect=True)
 Books = Base.classes.books
 
-<<<<<<< HEAD
-=======
 
 
->>>>>>> bookpage
 #DAY4 - TASK-2 USING LOGIN MANAGER TO AUTHENTICATE USER SESSIONS
 login_manager = LoginManager()
 login_manager.login_view = 'auth'
@@ -147,7 +141,6 @@ def logout():
 def welcome():
     return render_template("home.html", user = current_user, flag = False)
 
-<<<<<<< HEAD
 @app.route('/search', methods=['POST'])
 @login_required
 def search():
@@ -176,12 +169,6 @@ def search():
     return render_template("home.html", user = current_user, flag = True ,data = books)
 
 
-@app.route('/bookdisplay/<book_id>')
-@login_required
-def bookdisplay(book_id):
-    return book_id
-=======
-
 @app.route("/books/<book_id>")
 @login_required
 def bookdisplay(book_id):
@@ -189,5 +176,16 @@ def bookdisplay(book_id):
     book = session.query(Books).filter_by(isbn=book_id).first()
     r = json.dumps(res.json())
     loaded_r = json.loads(r)
+    # return "Under construction"
     return render_template("book.html", ratings = loaded_r, details = book.__dict__, user = current_user)
->>>>>>> bookpage
+
+
+# @app.route("/api/book/<book_id>")
+# def bookpage_api(book_id):
+#     # res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": "iGZG0s5CY0rwO3Muq7Nw0g", "isbns": book_id})
+#     # book = session.query(Books).filter_by(isbn=book_id).first()
+#     # r = json.dumps(res.json())
+#     # loaded_r = json.loads(r)
+
+#     return "Under construction"
+
