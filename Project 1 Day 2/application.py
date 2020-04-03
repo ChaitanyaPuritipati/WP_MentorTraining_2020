@@ -222,6 +222,7 @@ def search_api():
     # print("here")
     return jsonify({"response":resp}), 200
 
+
 @app.route("/api/book/<book_id>")
 def bookpage_api(book_id):
     try:
