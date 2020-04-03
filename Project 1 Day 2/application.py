@@ -16,6 +16,8 @@ from flask_login import login_user,login_required, current_user, logout_user
 from flask_login import UserMixin
 import requests
 import json
+from flask import jsonify
+import bookpage
 
 app = Flask(__name__)
 
@@ -89,10 +91,15 @@ def index():
 @app.route("/register" , methods=['POST'])
 def register():
     indata = Dataentry(request.form['Username'], request.form['Email'], request.form['password'])
+    user = Dataentry.query.filter_by(Email=request.form['Email']).first()
+    if user is not None:
+        flash('User Already exists')
+        return redirect('/')
     try:
         db.session.add(indata)
         db.session.commit()
     except Exception as e:
+        print(Exception)
         sys.stdout.flush()
         flash('Sorry!!! Registration Failed')
         return redirect('/')
@@ -172,11 +179,11 @@ def bookdisplay(book_id):
     book = session.query(Books).filter_by(isbn=book_id).first()
     r = json.dumps(res.json())
     loaded_r = json.loads(r)
+    # return "Under construction"
     return render_template("book.html", ratings = loaded_r, details = book.__dict__, user = current_user)
 
 @app.route("/api/search/", methods = ["POST"])
 def search_api():
-
     print(request.get_json())
     if not request.is_json:
         return jsonify({"Error":'Invalid request format'}), 405
@@ -212,4 +219,27 @@ def search_api():
         d["author"] = vals.author
         d["year"] = vals.year
         resp.append(d)
+    # print("here")
     return jsonify({"response":resp}), 200
+
+@app.route("/api/book/<book_id>")
+def bookpage_api(book_id):
+    try:
+        details = bookpage.bookpagehelper(book_id)
+        book = details[0]
+        res = details[1]
+    except ValueError:  # includes simplejson.decoder.JSONDecodeError
+        return jsonify({"error": "Please Provide Correct details"}), 404
+    except AttributeError as e:
+        return jsonify({"error": "Please Provide Correct details"}), 404
+    except Exception as e:
+        print(e)
+        return jsonify({"error": "Database Issues. Please Try Later"}), 500
+    data = {
+            "title": book['title'],
+            "Author": book['author'],
+            "Year of Publication": book['year'],
+            "Average rating": res['books'][0]['average_rating']
+           }
+    return jsonify(data), 200
+
