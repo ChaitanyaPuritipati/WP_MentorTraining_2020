@@ -1,6 +1,6 @@
 <script>
   function search_book(){
-    document.getElementById("search_results").innerHTML = ""
+    document.getElementById("search_results").innerHTML = "";
     var query = document.getElementById("query").value;
     var option = document.getElementById("option").value;
     // console.log(query, option)
@@ -14,6 +14,9 @@
         console.log(data);
         try {
           data.response.forEach(function(book) {
+            document.getElementById("search_results").innerHTML += "<div class='container'> <div class='row'>" + 
+		      "<div class='col-lg'><b>Author</b></div><div class='col-lg'><b>Title</b></div>" +
+		    "<div class='col-lg'><b>Year</b></div></div></div>"
             document.getElementById("search_results").innerHTML += "<div class='container'> <div class='row'> <div class='col-lg'>" +
           book.author + "</div> <div class='col-lg'>" + book.title + "</div> <div class='col-lg'>" + book.year + "</div> </div>"
           });
