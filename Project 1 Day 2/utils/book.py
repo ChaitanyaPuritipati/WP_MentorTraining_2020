@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from sqlalchemy import Column, Integer, String
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -21,9 +22,14 @@ Session = sessionmaker(bind=engine)
 Session.configure(bind=engine)
 session = Session()
 
+@dataclass
 class Book(Base):
-    __tablename__ = 'books'
+    isbn: str
+    title: str
+    author: str
+    year: int
 
+    __tablename__ = 'books'
     isbn = Column(String, primary_key=True)
     title = Column(String)
     author = Column(String)
@@ -36,22 +42,22 @@ class Book(Base):
 
 Base.metadata.create_all(engine)
 
-with open('books.csv') as csv_file:
-    csv_reader = csv.DictReader(csv_file)
-    line_count = 0
-    for row in csv_reader:
-        if line_count == 0:
-            print("Header")
-        else:
-            book = session.query(Book).filter_by(isbn=row["isbn"]).first()
-            if not book:
-                book = Book(row["isbn"] , row["title"], row["author"], row["year"])
-                session.add(book)
-            else:
-                print("Already Present in the database")
-        session.commit()
-        line_count = line_count + 1
-    print("Loading Complete")
+# with open('books.csv') as csv_file:
+#     csv_reader = csv.DictReader(csv_file)
+#     line_count = 0
+#     for row in csv_reader:
+#         if line_count == 0:
+#             print("Header")
+#         else:
+#             book = session.query(Book).filter_by(isbn=row["isbn"]).first()
+#             if not book:
+#                 book = Book(row["isbn"] , row["title"], row["author"], row["year"])
+#                 session.add(book)
+#             else:
+#                 print("Already Present in the database")
+#         session.commit()
+#         line_count = line_count + 1
+#     print("Loading Complete")
 
 
 
