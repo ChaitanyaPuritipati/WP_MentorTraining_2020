@@ -1,3 +1,28 @@
+<script>
+  function search_book(){
+    document.getElementById("search_results").innerHTML = ""
+    var query = document.getElementById("query").value;
+    var option = document.getElementById("option").value;
+    // console.log(query, option)
+    var http = new XMLHttpRequest();
+    http.open("POST", "/api/search/");
+    http.setRequestHeader("Content-Type", "application/json");
+    var data = JSON.stringify({ "que": query, "opt": option});
+    http.send(data);
+    http.onload  = () => {
+        var data = JSON.parse(http.responseText);
+        console.log(data);
+        try {
+          data.response.forEach(function(book) {
+            document.getElementById("search_results").innerHTML += "<div class='container'> <div class='row'> <div class='col-lg'>" +
+          book.author + "</div> <div class='col-lg'>" + book.title + "</div> <div class='col-lg'>" + book.year + "</div> </div>"
+          });
+        } catch(err) {
+          document.getElementById("search_results").innerHTML += data.Error;
+        }
+    }
+  }
+</script>
 {% extends "generictemplate.html" %}
 {% block title %} Welcome {% endblock %}
 {% block body %}
@@ -11,18 +36,18 @@
         <button class="btn btn-outline-warning" type="submit">Logout</button>
     </form>
   </nav>
-  <form action="/search" method = "post">
     <label for="search">Search Box</label>
-    <input type="search" class="form-control" placeholder="Search" name = "query">
-    <select name="option">
+    <input type="search" class="form-control" placeholder="Search" name = "query" id = "query">
+    <select id = "option" name="option">
       <option value="title">Title</option>
       <option value="author">Author</option>
       <option value="year">Year</option>
       <option value="isbn">ISBN</option>
     </select>
-    <input type="submit" >
-  </form>
-  {% if flag %}
+    <input type="submit" onclick="search_book()">
+  <div id = "search_results">
+  </div> 
+  <!-- {% if flag %}
   <div class="container">
 		<div class="row">
 			<div class="col-lg">
@@ -59,5 +84,6 @@
 		</div>
 	</div>
   {% endfor %}
-  {% endif %}
+  {% endif %} -->
 {% endblock %}
+
