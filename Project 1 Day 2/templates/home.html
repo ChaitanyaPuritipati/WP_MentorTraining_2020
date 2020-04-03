@@ -1,4 +1,21 @@
 <script>
+
+  function func(element) {
+        
+        const req = new XMLHttpRequest();
+        const url ='api/book/'+element.getAttribute("name");
+        req.open('GET',url);
+        req.onload = () => {
+              // Extract JSON data from request
+              const data = JSON.parse(req.responseText);
+              document.getElementById("bookpage").innerHTML = "<div class='card'> <div class='card-body'> <h3 class='card-title'>" + data["title"] + "</h3>" +
+                 "<h5 class = 'card-text'> Author :"+ data["Author"]+ " </h5><h5 class = 'card-text'>Year : "+data["Year of Publication"]+"</h5><h5 class = 'card-text'>  ISBN : "+element.getAttribute("name")+"</h5>" +"</h5><h5 class = 'card-text'>  Avergae Rating : "+data["Average rating"]+"</h5>";
+        }
+        req.send();
+  }
+
+
+
   function search_book(){
     document.getElementById("search_results").innerHTML = "";
     var query = document.getElementById("query").value;
@@ -18,7 +35,7 @@
 		      "<div class='col-lg'><b>Author</b></div><div class='col-lg'><b>Title</b></div>" +
 		    "<div class='col-lg'><b>Year</b></div></div></div>"
             document.getElementById("search_results").innerHTML += "<div class='container'> <div class='row'> <div class='col-lg'>" +
-          book.author + "</div> <div class='col-lg'>" + book.title + "</div> <div class='col-lg'>" + book.year + "</div> </div>"
+          book.author + "</div> <div class='col-lg'>" + book.title + "</div> <div class='col-lg'>" + book.year + "</div> <button name='"+ book.isbn + "' onclick ='func(this)'>View Book</button></div>"
           });
         } catch(err) {
           document.getElementById("search_results").innerHTML += data.Error;
@@ -50,6 +67,14 @@
     <input type="submit" onclick="search_book()">
   <div id = "search_results">
   </div> 
+
+  <div class="container">
+    <div class="row" >
+       <div class = "col-md-3"></div>
+       <div class = col-md-6 id = "bookpage"></div>
+       <div class = col-md-3></div>
+    </div>
+  </div>
   <!-- {% if flag %}
   <div class="container">
 		<div class="row">
